@@ -67,6 +67,121 @@ Về cơ bản, thường là với ASCII chữ và số.
 những điều đơn giản, cố gắng chỉ sử dụng các ký tự chữ thường.
 • Tên cơ sở dữ liệu được giới hạn tối đa 64 byte.
 
+## CRUD cơ bản
+### Create
+- Tạo 1 object javascript
+```
+post = {"title" : "My Blog Post",
+... "content" : "Here's my blog post.",
+... "date" : new Date()}
+{
+ "title" : "My Blog Post",
+ "content" : "Here's my blog post.",
+ "date" : ISODate("2012-08-24T21:12:09.982Z")
+}
+```
+- Insert vào collection
+```
+db.blog.insert(post)
+```
+
+### Find
+Lúc này object bạn tạo được save vào rồi, chúng ta sẽ dùng find hoặc findOne để tìm nó
+- `Find`: in ra 20 bản ghi match các điều kiện
+- `findOne`: in ra 1 bản ghi thôi
+
+### Update
+- Đầu tiên chỉnh sửa object post, add thêm thuộc tính comment vào
+```
+post.comments = []
+```
+
+- update lại
+```
+db.blog.update({title : "My Blog Post"}, post)
+``` 
+
+### Xóa
+```
+db.blog.remove({title : "My Blog Post"})
+```
+
+## Data types
+- Null
+```
+{"x" : null}
+```
+- boolean
+```
+{"x" : true}
+```
+- Number
+```
+{"x" : 3.14}
+```
+- String
+```
+{"x" : "foobar"}
+```
+
+- date lưu dưới dạng milliseconds. Khi gọi tạo 1 date mới cho object chúng ta sẽ phải gọi `new Date()` chứ không phải mỗi `Date()` không
+```
+{"x" : new Date()}
+```
+
+- regular expression
+```
+{"x" : /foobar/i}
+```
+
+- array 
+```
+{"x" : ["a", "b", "c"]}
+```
+
+- embedded document
+```
+{"x" : {"foo" : "bar"}}
+```
+
+- object id
+```
+{"x" : ObjectId()}
+```
+![image](https://user-images.githubusercontent.com/45547213/62261367-44b28400-b43f-11e9-900a-3acfaf50271b.png)
+
+
+- binary data
+- code
+```
+{"x" : function() { /* ... */ }}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
