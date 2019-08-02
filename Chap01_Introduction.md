@@ -4,9 +4,12 @@
 Document là đơn vị dữ liệu cơ bản cho MongoDB và gần tương đương với một hàng trong hệ thống quản lý cơ sở dữ liệu quan hệ 
 (nhưng okke hơn nhiều).
 • Tương tự, một collection có thể được coi là một bảng có lược đồ động.
+
 • Một phiên bản MongoDB duy nhất có thể lưu trữ nhiều cơ sở dữ liệu độc lập, mỗi database
 trong đó có thể nhiều collection.
+
 • Mỗi tài liệu có một khóa đặc biệt, "_id", là duy nhất trong một bộ sưu tập.
+
 • MongoDB đi kèm với trình bao JavaScript đơn giản nhưng mạnh mẽ, rất hữu ích cho việc quản trị các phiên bản MongoDB và thao tác dữ liệu.
 
 ![image](https://user-images.githubusercontent.com/45547213/62197520-2cdcf080-b3aa-11e9-8bde-2189523c047a.png)
@@ -34,10 +37,13 @@ cũng khác nhau nha
 ### Quy ước đặt tên cho collection
 bộ sưu tập được phân biệt bởi tên. Tên bộ sưu tập có thể là bất kỳ chuỗi UTF-8 nào, với một vài hạn chế:
 • Chuỗi trống ("") không phải là tên bộ sưu tập hợp lệ.
+
 • Tên bộ sưu tập có thể không chứa ký tự \0 (ký tự null) vì cái này mô tả sự kết thúc của một tên bộ sưu tập.
+
 • Bạn không nên tạo bất kỳ bộ sưu tập nào bắt đầu với `system`., Tiền tố dành riêng chobộ sưu tập nội bộ. 
 Ví dụ: bộ sưu tập system.users chứa cơ sở dữ liệu người dùng, 
 và bộ sưu tập system.namespaceschứa thông tin về tất cả các bộ sưu tập cơ sở dữ liệu.
+
 • Bộ sưu tập do người dùng tạo không được chứa ký tự dành riêng $ trong tên. Các trình điều khiển khác nhau có sẵn 
 cho cơ sở dữ liệu hỗ trợ sử dụng $ trong tên bộ sưu tập vì một số bộ sưu tập do hệ thống tạo có chứa nó. 
 Bạn không nên sử dụng $ trong tên trừ khi bạn đang truy cập một trong những bộ sưu tập này.
@@ -51,6 +57,7 @@ Mặc dù các bộ sưu tập con không có bất kỳ thuộc tính đặc bi
 
 • GridFS, một giao thức để lưu trữ các tệp lớn, sử dụng các bộ lọc con để lưu trữ siêu dữ liệu của tệp
 tách biệt với các đoạn nội dung (xem Chương 6 để biết thêm thông tin về GridFS).
+
 • Hầu hết các trình điều khiển cung cấp một số đường cú pháp để truy cập vào một bộ sưu tập con của một
 bộ sưu tập. Ví dụ: trong vỏ cơ sở dữ liệu, db.blog sẽ cung cấp cho bạn bộ sưu tập blog và db.blog.posts sẽ cung cấp cho bạn bộ sưu tập blog.posts.
 
@@ -61,10 +68,13 @@ Subcollections là một cách tuyệt vời để tổ chức dữ liệu trong
 ## Database
 ## Quy ước đặt tên
 • Chuỗi rỗng ("") không phải là tên cơ sở dữ liệu hợp lệ.
+
 • Tên cơ sở dữ liệu không thể chứa bất kỳ ký tự nào trong số này: /, \,., ", *, <,>,:, |,?, $, (Một khoảng trắng) hoặc \ 0 (ký tự null).
 Về cơ bản, thường là với ASCII chữ và số.
+
 • Tên cơ sở dữ liệu phân biệt chữ hoa chữ thường, ngay cả trên các hệ thống tệp không phân biệt chữ hoa chữ thường. Để giữ
 những điều đơn giản, cố gắng chỉ sử dụng các ký tự chữ thường.
+
 • Tên cơ sở dữ liệu được giới hạn tối đa 64 byte.
 
 ## CRUD cơ bản
