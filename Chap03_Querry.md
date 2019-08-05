@@ -287,13 +287,64 @@ chỉ cho in ra 3 cái thôi nếu không đủ thì không in ra
 
 #### Skip
 skip 3 cái đầu rồi làm in từ đó về sau
+```
+db.c.find().skip(3)
+```
+
+### Tránh bỏ qua nhiều
+Sử dụng bỏ qua cho một số lượng nhỏ các tài liệu là tốt. Đối với một số lượng lớn kết quả, bỏ qua có thể chậm, vì nó phải tìm và sau đó loại bỏ tất cả các kết quả bị bỏ qua. Hầu hết các cơ sở dữ liệu giữ nhiều siêu dữ liệu hơn trong chỉ mục để giúp bỏ qua, nhưng MongoDB chưa hỗ trợ điều này, vì vậy nên bỏ qua các bước lớn. 
 
 
+### Advanced Query option
+Có 2 kiểu là query là wrapped và plain
+- wrapped
+```
+var cursor = db.foo.find({"foo" : "bar"})
+```
+- plain
+```
+var cursor = db.foo.find({"foo" : "bar"}).sort({"x" : 1})
+```
 
+### Getting consistent result
+Bây giờ, khi chúng tôi thực hiện tìm kiếm, con trỏ bắt đầu trả về kết quả từ đầu bộ sưu tập và di chuyển sang phải. Chương trình của bạn lấy 100 tài liệu đầu tiên và xử lý chúng. Khi bạn lưu chúng trở lại cơ sở dữ liệu, thông thường nó sẽ bị chuyển xuống cuối.
 
+Bây giờ chương trình của chúng tôi tiếp tục lấy các lô tài liệu. Khi đến cuối, nó sẽ trả lại các tài liệu được di dời một lần nữa (Hình 4-4)!
 
+Giải pháp cho vấn đề này là snapshot truy vấn của bạn. Nếu bạn thêm tùy chọn, truy vấn sẽ được chạy bằng cách duyệt qua chỉ mục "_id", điều này đảm bảo rằng bạn sẽ chỉ trả về mỗi tài liệu một lần. Ví dụ: thay vì db.foo.find (), bạn sẽ chạy:
 
+```
+> db.foo.find ().snapshot()
+```
 
+### database command
+Có một loại truy vấn rất đặc biệt gọi là lệnh cơ sở dữ liệu. Chúng ta đã nói đến việc tạo, cập nhật, xóa và tìm tài liệu. Các lệnh cơ sở dữ liệu thực hiện mọi thứ khác, từ các nhiệm vụ quản trị như tắt máy chủ và sao chép cơ sở dữ liệu để đếm các tài liệu trong bộ sưu tập và thực hiện tổng hợp.
+
+Các lệnh được đề cập trong suốt văn bản này, vì chúng hữu ích cho việc thao tác, quản trị và giám sát dữ liệu. Ví dụ, việc thả bộ sưu tập được thực hiện thông qua lệnh "thả" cơ sở dữ liệu:
+
+```
+db.runCommand({"drop" : "test"});
+{
+ "nIndexesWas" : 1,
+ "msg" : "indexes dropped for collection",
+ "ns" : "test.test",
+ "ok" : true
+}
+```
+
+#### Cách hoạt động
+
+database command luôn trả về document chứa khóa "ok". Nếu "ok" là 1, lệnh đã thành công; và nếu nó là 0, lệnh không thành công vì một số lý do. Nếu "ok" là 0 thì một khóa bổ sung sẽ xuất hiện, "errmsg". Giá trị của "errmsg" là một chuỗi giải thích tại sao lệnh thất bại. Ví dụ, hãy để Lôi thử chạy lại lệnh thả, trên bộ sưu tập đã bị loại bỏ trong phần trước:
+
+```
+> db.runCommand({"drop" : "test"});
+{ "errmsg" : "ns not found", "ok" : false }
+```
+
+Các lệnh trong MongoDB được triển khai như một loại truy vấn đặc biệt được thực hiện trên $ cmd collection. runCommand chỉ cần lấy một tài liệu lệnh và thực hiện truy vấn tương đương, vì vậy lệnh gọi thả của chúng ta trở thành như sau:
+```
+db.$cmd.findOne({"drop" : "test"});
+```
 
 
 
