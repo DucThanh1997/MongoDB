@@ -159,7 +159,7 @@ db.blog.posts.findOne(criteria, {"comments" : {"$slice" : 10}})
 - Lấy 10 comment cuối
 ```
 db.blog.posts.findOne(criteria, {"comments" : {"$slice" : -10}})
-``
+```
 
 - Lấy 10 comment từ comment số 24 trở đi
 ```
