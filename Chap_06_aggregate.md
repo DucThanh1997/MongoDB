@@ -144,10 +144,106 @@ Ví dụ
       + `"$strcasecmp" : [string1, string2]`: so sánh chuỗi
       + `"$eq"/"$ne"/"$gt"/"$gte"/"$lt"/"$lte" : [expr1, expr2]`: so sánh nhỏ lớn hơn bằng
       + `"$or" : [expr1[, expr2, ..., exprN]]`: toán tử OR
-      + 
+
+## Group
+Group cho phép bạn nhóm các document dựa trên các trường nhất định và kết hợp các giá trị của chúng.
+
+Ví dụ: Chúng ta có collection của học sinh, và chúng ta muốn tổ chức học sinh theo nhóm dựa trên `grade`. Chúng ta sẽ group theo grade
+
+`• {"$group" : {"_id" : "$grade"}}`
 
 
+### Các toán tử
+- `"$sum"` : tổng
+```
+> db.sales.aggregate(
+... {
+... "$group" : {
+... "_id" : "$country",
+... "totalRevenue" : {"$sum" : "$revenue"}
+... }
+... })
+```
 
+- `"$avg"` : trung bình
+```
+> db.sales.aggregate(
+... {
+... "$group" : {
+... "_id" : "$country",
+... "totalRevenue" : {"$average" : "$revenue"},
+... "numSales" : {"$sum" : 1}
+... }
+... })
+```
+
+## Unwind
+Unwinding biến mỗi trường của một mảng thành một document riêng biệt. Ví dụ: nếu chúng tôi có một blog có các bình luận, chúng tôi có thể sử dụng thư giãn để biến mỗi bình luận thành tài liệu của riêng mình.
+
+Rất ôkke nếu bạn muốn trả về một số subdocuments nhất định từ một truy vấn: `$Unwind` các subdocuments và sau đó `$match` những subdocuments bạn muốn
+
+```
+> db.blog.aggregate({"$project" : {"comments" : "$comments"}},
+... {"$unwind" : "$comments"},
+... {"$match" : {"comments.author" : "Mark"}})
+```
+
+## $sort
+Sắp xếp 1 trường hay nhiều trường đều được
+```
+db.employees.aggregate(
+... {
+...   "$project" : {
+...      "compensation" : {
+...         "$add" : ["$salary", "$bonus"]
+...      },
+...      "name" : 1
+...      }
+...   },
+...   {
+...      "$sort" : {"compensation" : -1, "name" : 1}
+...})
+
+```
+
+## Sử dụng pipeline
+Cố gắng lọc ra càng nhiều document (và càng nhiều field từ các document) càng tốt ở đầu pipeline của bạn trước khi thực hiện bất kỳ hoạt động "$ project", "$ group" hoặc "$ unwind" nào. Khi pipeline không được sử dụng dữ liệu trực tiếp từ collection, các index không còn có thể được sử dụng để giúp lọc và sắp xếp. Các pipeline tổng hợp sẽ cố gắng sắp xếp lại các hoạt động cho bạn, nếu có thể, để sử dụng các chỉ mục.
+
+MongoDB sẽ không cho phép một aggreation duy sử dụng nhiều hơn một phần bộ nhớ của hệ thống: nếu nó tính toán rằng một aggreation đã sử dụng hơn 20% bộ nhớ, thì aggreation đó sẽ đơn giản là lỗi. Việc cho phép đầu ra được dẫn đến một bộ sưu tập (sẽ giảm thiểu lượng bộ nhớ cần thiết) được lên kế hoạch cho tương lai.
+
+Nếu bạn có thể nhanh chóng giảm kích thước tập kết quả bằng "$match" chọn lọc, bạn có thể sử dụng đường ống cho các aggreation thời gian thực. Vì các pipeline cần bao gồm nhiều document hơn và trở nên phức tạp hơn, nên ít có khả năng bạn có thể nhận được kết quả thời gian thực từ họ.
+
+
+## Map reduce
+MapReduce là một công cụ mạnh mẽ và linh hoạt để tổng hợp dữ liệu. Nó có thể giải quyết một số vấn đề quá phức tạp để diễn đạt bằng cách sử dụng khung tổng hợp Ngôn ngữ truy vấn của ngôn ngữ.MapReduce sử dụng JavaScript làm ngôn ngữ truy vấn của nó, vì vậy nó có thể diễn đạt logic phức tạp tùy ý. Tuy nhiên, sức mạnh này có giá: MapReduce có xu hướng khá chậm và không nên được sử dụng để phân tích dữ liệu thời gian thực.
+
+MapReduce có thể dễ dàng song song trên nhiều máy chủ. Nó phân tách một vấn đề, gửi các phần của nó đến các máy khác nhau và cho phép mỗi máy giải quyết một phần của vấn đề. Khi tất cả các máy đã hoàn thành, chúng hợp nhất tất cả các phần của giải pháp lại thành một giải pháp đầy đủ.
+
+## Aggregation Commands
+### count
+đếm số lượng document trong collection
+```
+> db.foo.count()
+0
+> db.foo.insert({"x" : 1})
+> db.foo.count()
+```
+
+### distinct
+Loại bỏ các bản ghi có cùng tên cho vào thành 1 cái và thường đi cùng với group
+```
+> db.runCommand({"distinct" : "people", "key" : "age"})
+```
+
+```
+{"name" : "Ada", "age" : 20}
+{"name" : "Fred", "age" : 35}
+{"name" : "Susan", "age" : 60}
+{"name" : "Andy", "age" : 35}
+```
+
+### group
+Trên có nói rồi. Gộp nhiều bản ghi lại theo 1 điều kiện nào đó
 
 
 
