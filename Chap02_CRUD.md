@@ -9,13 +9,16 @@ db.foo.insert({"bar" : "baz"})
 ```
 db.foo.batchInsert([{"_id" : 0}, {"_id" : 1}, {"_id" : 2}])
 ```
+- Nếu bạn thêm càng nhiều document thì mongo sẽ thêm càng nhanh
+
+- Giới hạn của mongo cho 1 câu lệnh là 48Mb. Nếu bạn đang thêm giữa chừng mà failed thì nhưng document trước đoạn failed đó vẫn được đưa vào còn đoạn sau thì không. Nếu bạn muốn skip qua error và tiếp tục thì phải thêm option `continueOnError`. Shell không support nhưng các driver thì có
 
 - Khi Insert vào Mongo sẽ thêm vào trường `_id` nếu không có và check xem doucment đó có dưới 16Mb không
 
 
 ## Remove
 - Cú pháp
-Xóa toàn bộ document trong collection foo
+Xóa toàn bộ document trong collection foo nhưng giữ metadata
 ```
 db.foo.remove()
 ```
@@ -25,6 +28,7 @@ Xóa toàn bộ document trong collection mailing mà opt-out = true
 db.mailing.list.remove({"opt-out" : true})
 ```
 
+- Bạn có thể dùng drop để xóa cho nhanh hơn nó nhanh hơn nhiều so với remove
 
 ## Update
 - Giả sử nếu có 2 update xảy ra cái nào được update trước thì sẽ update trước rồi cái update đến sau update lại, thời gian tính bằng

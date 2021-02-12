@@ -24,7 +24,11 @@ object id sẽ auto được trả ra dù như nào đi nữa
 ```
 db.users.find({}, {"fatal_weakness" : 0})
 ```
-
+### Limitation
+Có 1 vài giới hạn trong querry. Giá trị của query phải là constant. Ví dụ như này sẽ fail
+```
+db.stock.find({"in_stock" : "this.num_sold"}) // doesn't work
+```
 ## Query criteria
 ### Query conditional
 
@@ -47,6 +51,10 @@ tìm được cả bằng thời gian nhé
 ### OR query
 Có 2 cách để làm truy vấn OR 
 - `$in`
+```
+db.users.find({"user_id" : {"$in" : [12345, "joe"]})
+```
+
 - `$or`
 
 #### $in
@@ -61,6 +69,8 @@ tìm những document có ticket_no có giá trị 725, 542, 390
 ```
 db.users.find({"user_id" : {"$in" : [12345, "joe"]})
 ```
+
+`$in` tối ưu hơn `$or`
 
 #### $nin
 `$nin` là not in ngược lại của in và vẫn có những tính năng như vậy
@@ -90,6 +100,14 @@ Có thể cho nhiều condition vào 1 key nhưng không thể cho nhiều updat
 db.users.find({"$and" : [{"x" : {"$lt" : 1}}, {"x" : 4}]})
 ```
 
+- Conditional sẽ nằm ở trong còn cái lệnh modifier sẽ nằm ở ngoài
+
+- Trong khi nhiều condittional có thể dùng trên 1 key nhưng modifier thì không được
+```
+{"$inc" : {"age" : 1}, "$set" : {age : 40}}
+```
+
+
 ## Truy vấn loại cụ thể
 
 ### null
@@ -103,6 +121,11 @@ db.c.find()
 - Cú pháp query document có y là null
 ```
 db.c.find({"z" : {"$in" : [null], "$exists" : true}})
+```
+
+- Nếu bạn viết như này nó sẽ trả ra các hàm mà y bị thiếu
+```
+{ "_id" : ObjectId("4ba0f0dfd22aa494fd523621"), "y" : null }
 ```
 
 ### regular expression
@@ -146,6 +169,24 @@ Kết quả
  ```
  
 chúng ta có thể thấy không quan trọng thứ tự
+
+Nếu bạn muốn querry kiểu phải match cả array thì mới in ra
+```
+db.food.find({"fruit" : ["apple", "banana", "peach"]})
+```
+
+Hoặc nếu bạn muốn querry những thằng là peach ở vị trí số 2
+```
+db.food.find({"fruit.2" : "peach"})
+```
+
+### seize
+Muốn tìm các loại fruit có array size là 3 thì làm như này
+```
+> db.food.find({"fruit" : {"$size" : 3}})
+```
+
+**Lưu ý**: thằng size này không kết hợp được với các thằng condition kahcs như là `$gt`
 
 
 
@@ -224,6 +265,16 @@ db.test.find({"x" : {"$elemMatch" : {"$gt" : 10, "$lt" : 20}})
 ```
 > db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})
 ```
+
+Tuy nhiên sử dụng cách querry trên phải match cả cái bản ghi embed nên chúng ta sẽ query như ở dưới đây cho tiện
+
+```
+> db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})
+```
+
+Bây giờ nếu thằng name có nhiều key hơn nhưng nó vẫn có thể match những thằng có first và last như hình trên
+
+
 ### Where
 - Where chỉ là cách cuối cùng bạn làm để query thôi nha
 ```
