@@ -1,0 +1,3 @@
+- `db.users.deleteOne({name: :"Chris"})` xóa 1 cái match cái filter đầu tiên
+- `db.users.deleteMany({totalAge: {$exists: false}, isSporty: true})` xóa theo nhiều điều kiện và nhiều văn bản
+- `db.users.drop` xóa cả collection

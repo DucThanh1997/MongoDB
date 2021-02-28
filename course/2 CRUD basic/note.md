@@ -71,7 +71,7 @@ Dùng lệnh này kết quả show ra sẽ không đẹp nên chúng ta dùng l�
     + findOne(filter, option): tìm 1 kết quả thôi `db.flightData.find({distance: {$gt:12000}}).pretty()` 
 
 - Update
-    + updateOne(filter, data, options): update 1 document thôi `db.flightData.deleteOne({departureAirport:"TXL"})`
+    + updateOne(filter, data, options): update 1 document thôi `db.flightData.updateOne({_id:ObjectId("aaA"}, {$set:{delayed: true}})`
     + updateMany(filter, data, options): update nhiều document `db.flightData.updateMany({},{$set:{marker: "toDelete"}})` cái lệnh này vì filter để rỗng nên nó sẽ update cả collection
     + update: gần giống updateMany nhưng nó không cần thêm cái operator set và nó sẽ overwrite toàn bộ cái document đó bằng data trong cái ngoặc thứ 2 `db.flightData.updateMany({},{marker: "toDelete"})`
     + replaceOne(filter, data, options): thay thế luôn cái document đó
@@ -79,3 +79,52 @@ Dùng lệnh này kết quả show ra sẽ không đẹp nên chúng ta dùng l�
 - Delete
     + deleteOne(filter, option): xóa 1 cái document đi `db.flightData.deleteOne({departureAirport:"TXL"})`
     + deleteMany(filter, option): xóa nhiều cái document đi `db.flightData.deleteMany({marker: "toDelete"})`
+
+## Find
+lệnh find trả về chúng ta 1 cursor để chúng ta có thể loop qua các kết quả nếu nó quá dài
+```
+db.passengers.find().forEach((passengerData) => {printjson(passengerData)})
+```
+`db.passengers.find()` trả về 1 cursor object sau đó chúng ta dùng hàm `forEach` với cái cursor đó để in ra từng cái data 1. Nếu bình thường thì cursor object sẽ in ra 20 cái đầu tiên thôi. Ở lệnh này nó sẽ trả ra hết và in ra từng cái 1 
+
+Tìm hành khách có sở thích là sport
+```
+db.passengers.findOne({hobbies: "sport"})
+```
+mongo đủ thông minh để tìm trong từng array 1
+
+## Projection
+nó là kiểu lựa chọn các trường bạn muốn in ra chứ không phải là lấy ra hết
+```
+db.passengers.find({},{name: 1, _id: 0}).pretty()
+```
+
+Câu lệnh ở trên là chỉ lấy name thôi bỏ id và age
+
+## embedded document
+Nó kiểu như là trong 1 document có 1 document con nữa (max là 100 document). và 1 document max dung lượng là 16mb
+```
+db.flightData.updateMany({}, {
+                                $set: 
+                                {
+                                    status: 
+                                    {
+                                        description: "on-time", 
+                                        lastUpdated: "1 hour ago", 
+                                        details: {
+                                                responsible:"thanh"
+                                        }
+                                    }
+                                }
+                            }
+                        )
+```
+
+Tìm 1 bản ghi responsible là thanh
+```
+db.flightData.find({"status.details.responsible": "thanh"}).pretty()
+
+## Arrays
+```
+db.passengers.updateOne({name: "Albert Twostone"}, {$set: {hobbies: ["cooking", "sport"]}})
+```
